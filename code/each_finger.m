@@ -1,7 +1,6 @@
 
 close all;
 %% 
-OVSF = 256;
 BW = 3.84e+6;
 
 rdj = zeros(framen, fingern);

@@ -6,6 +6,7 @@ Nfft = 1024; Nfold = OVSF;
 F = 3.84e+6;
 
 symbols_per_slot = 10;
+chips_per_slot = symbols_per_slot * Nfold;  % OVSF * symbolsPerSlot
 
 slot_n = length(frame3_despreaded) / symbols_per_slot;
 
@@ -14,8 +15,6 @@ m0 = reshape(frame3_despreaded, [symbols_per_slot, slot_n]);
 m0 = fft(m0, Nfft);
 
 d6_freq = zeros(slot_n, 1);
-
-chips_per_slot = symbols_per_slot * Nfold;  % OVSF * symbolsPerSlot
 d6_phase = zeros(chips_per_slot, slot_n);
 
 for this_slot = 1:slot_n
@@ -24,7 +23,7 @@ for this_slot = 1:slot_n
 
 %     mag2 = fft(xcorr(m), Nfft);
 
-    magnitude = abs( mag1 );   
+    magnitude = abs( mag1 );
 %     figure;plot(magnitude)
     ppp = find(magnitude == max(magnitude));
     ppp = min([ppp, Nfft-ppp]);
