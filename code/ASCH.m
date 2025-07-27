@@ -4,6 +4,9 @@ close all;
 clc;
 
 %% load data set first
+load '../../data_set/zp_complex__type_double.mat'
+load '../../data_set/local_all_ideal_100.mat'
+load '../../data_set/scramble_38400_by_8_by_0_63.mat'
 
 %%
 F = 3.84e6;
