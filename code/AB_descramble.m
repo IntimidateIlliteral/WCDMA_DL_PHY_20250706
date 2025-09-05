@@ -1,28 +1,29 @@
 
 % descramble, find cell_scramble_code
-close all;
+% close all;
+%%
+rcom_framestart  = rcom_1p8(pt-1 +ss_start0 + [1 : frames_you_need*chipsPerFrame]);
 %%
 primary_scramb_codet8 = scramble_64(:, :, ssc_sync063(1) + 1);
 primary_scramb_coder8 = conj(primary_scramb_codet8);
 %% scramble
-tmp_frame = rcom_ssynced(1 : 38400);
-
+tmp_frame = rcom_framestart(0+(1 : 38400));
+%
 dsc = tmp_frame .* primary_scramb_coder8;
-
 dsc = reshape(dsc, [256, 150, 8]);
 dsc = sum(dsc, 1); 
+%
 dsc = reshape(dsc, [150, 8]);
-
-tem = sum(abs(dsc) .^ 2, 1)
-
+tem = sum(abs(dsc) .^ 2, 1);
+tem = tem/max(tem)
+sort(tem)
 dsc = sum(dsc, 1);  % dsc = abs(dsc); 
-
 %
 dsc = find(tem == max(tem));
 primary_scramb_codet = primary_scramb_codet8(:, dsc);
 primary_scramb_coder = primary_scramb_coder8(:, dsc);
 %% Rx_3frame de_scramble
-rcom_desccred = reshape(rcom_ssynced,[38400,3]) .* primary_scramb_coder;
+rcom_desccred = reshape(rcom_framestart,[38400,3]) .* primary_scramb_coder;
 
 
 %%

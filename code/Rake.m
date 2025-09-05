@@ -1,30 +1,56 @@
-framen = 38400;
-
 fingern = 4;
 
-delay_spread = 40;  ds = delay_spread; % chips
+delay_spread_radius = 20;  dsr = delay_spread_radius; % chips
 
 scr = primary_scramb_codet8(:, dsc);
 
-xi = 1;
-tmp_f = rcom_ssynced(0+(1 : framen + ds));
-
-p = zeros(ds+1,1);
-
-for ci = 0:ds
+%%
+tmp_f = rcom_ssynced(1*chipsPerFrame+(-dsr : chipsPerFrame + dsr));
+p = zeros(2*dsr+1, 8);
+for ci = 0:2*dsr
     
-    frame = tmp_f(ci + (1:framen));
+    frame = tmp_f(ci + (1:chipsPerFrame));
     
-    p(1 + ci) = dpNscr_xg(frame, scr);   
+    p(1 + ci, :) = dpNscr_xg(frame, scr, 1);
     
 end
+p=p./max(p)
 
+%%
+oversample = 8;
 
+samplesPerFrame = oversample*chipsPerFrame;
+dsr8 = oversample*dsr;
+
+scr8 = scr + zeros(chipsPerFrame, oversample);
+scr8 = scr8.';
+scr8 = scr8(:);
+
+pt8 = (-1+pt)*oversample+1;
+sst8 = (-1+ss_start0)*oversample;
+tmp_f8 = rcom(1*samplesPerFrame + pt8 +(-dsr8 : samplesPerFrame + dsr8));
+
+p8 = zeros(2*dsr8+1,4);
+for ci = 0:2*dsr8
+    frame = tmp_f8(ci + (1:samplesPerFrame));
+    
+    p8(1 + ci, :) = dpNscr_xg(frame, scr8, 8);
+    
+end
+p8=p8./max(p8);
+
+close all;figure;
+p8size = size(p8);
+for pi = 1:p8size(2)
+    plot(p8(:,pi));hold on;
+    xticks(0:8:2*dsr8);grid on;
+end
+%%
 % p = jidazhi(p);
 
 [ps,pind] = sort(p); pind = pind(end:-1:1)
 jdz = 1;
-for i = 2:ds
+for i = 2:dsr
     it = pind(i);
 %     iz = pi(i-1);    
 %     iy = pi(i+1);

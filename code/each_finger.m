@@ -1,8 +1,6 @@
 
 close all;
-%% 
-BW = 3.84e+6;
-
+%%
 rdj = zeros(framen, fingern);
 for i = 1:fingern
     rdj(:,i) = rcom_ssynced(paths_finger(i)+(0:-1+38400));    
