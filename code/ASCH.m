@@ -9,10 +9,14 @@ clc;
 % load '../../data_set/scramble_38400_by_8_by_0_63.mat'
 
 load '../data1/rx_real_100ms.mat'
+
 load '../data1/code_p_sync.mat'
+
+load '../data1/zz.mat'
 load '../data1/code_s_sync.mat'
 load '../data1/frame_type_table_64_15.mat'
 load '../data1/code_scramble_38400_8_64.mat'
+
 %%
 F = 3.84e6;
 BW = F;
@@ -109,33 +113,42 @@ rcom_1p8 = rr8(:, phase+1);
 pt = psc_sync(rcom_1p8, c_pscf);
 rcom_psynced = rcom_1p8(pt:end);
 
-%% ssc frame_type
-sft = 3; Nt = 15*1;
-snt = Nt*sft;   
-slotss = rcom_psynced(1:snt*2560); 
-slotss = reshape(slotss,[2560,snt]);
-slotss = slotss(1:256,:);
-ss = zeros(16,snt);
-for strap = 1:16
-    ssa = c_ssc(:,strap) .* slotss;
+%% ssc frame_type: 2 methods
+f3 = 1;
+slots_you_need = slots_per_frame*f3;   
+slotss = rcom_psynced(1:slots_you_need*2560); 
+slotss = reshape(slotss,[2560,slots_you_need]);
+slotss = slotss(1:256,:); % 256*45
+%% xcorr(inner_prod) -> 1/16 peak
+ss = zeros(16,slots_you_need);
+for slid = 1:16
+    ssa = c_ssc(:,slid) .* slotss;
     ssa = sum(ssa,1);
-    ss(strap,:) = abs(ssa).^2;
+    
+    ss(slid,:) = abs(ssa).^2;
 end
-ss = reshape(ss,[16,15,3]);
+ss = reshape(ss,[16,slots_per_frame,f3]);
 ss = sum(ss,3);
-t = max(ss);ssout=zeros(15,1);
-for strap = 1:15
-    ssout(strap) = find(ss(:,strap)==t(strap));
+tssc = max(ss);
+ssout=zeros(15,1);
+for slid = 1:15
+    ssout(slid) = find(ss(:,slid)==tssc(slid));
 end
-
-% inner_product 15 slots
-ssout'
-
+ssout';
+%% fwht256 -> 'spectrum' peak
+% cost reduced significantly
+ssb = slotss.*z';
+ssb = fwht(ssb,OVSF,'hadamard');
+[tb, ssb] = max(abs(ssb));
+ssb = ssb/16 + 1;
+ssb = ssb.';
+ssout_fwht = floor(ssb); % todo: not divided by 16
+%%
 diversity = zeros(64,15);
 for antenna = 0:63
     for fen_ji=0:14
         cs = circshift(real_bdb15(antenna+1,:), fen_ji);
-        diversity(antenna+1,fen_ji+1) = sum(ssout' == cs);
+        diversity(antenna+1,fen_ji+1) = sum(ssout_fwht' == cs);
     end
 end
 diversity
