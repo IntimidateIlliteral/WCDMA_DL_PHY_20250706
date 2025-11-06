@@ -9,19 +9,19 @@ primary_scramb_coder8 = conj(primary_scramb_codet8);
 %% scramble
 tmp_frame = rcom_framestart(0+(1 : 38400));
 %
-dsc = tmp_frame .* primary_scramb_coder8;
-dsc = reshape(dsc, [256, 150, 8]);
-dsc = sum(dsc, 1); 
+dp_mo_square = tmp_frame .* primary_scramb_coder8;
+dp_mo_square = reshape(dp_mo_square, [256, 150, 8]);
+dp_mo_square = sum(dp_mo_square, 1); 
 %
-dsc = reshape(dsc, [150, 8]);
-tem = sum(abs(dsc) .^ 2, 1);
-tem = tem/max(tem)
-sort(tem)
-dsc = sum(dsc, 1);  % dsc = abs(dsc); 
+dp_mo_square = reshape(dp_mo_square, [150, 8]);
+ms8 = sum(abs(dp_mo_square) .^ 2, 1);
+ms8 = ms8/max(ms8)
+sort(ms8)
+dp_mo_square = sum(dp_mo_square, 1);  % dsc = abs(dsc); 
 %
-dsc = find(tem == max(tem));
-primary_scramb_codet = primary_scramb_codet8(:, dsc);
-primary_scramb_coder = primary_scramb_coder8(:, dsc);
+dp_mo_square = find(ms8 == max(ms8));
+primary_scramb_codet = primary_scramb_codet8(:, dp_mo_square);
+primary_scramb_coder = primary_scramb_coder8(:, dp_mo_square);
 %% Rx_3frame de_scramble
 rcom_desccred = reshape(rcom_framestart,[38400,3]) .* primary_scramb_coder;
 

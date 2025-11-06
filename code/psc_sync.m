@@ -17,12 +17,12 @@ rx1_abs = abs(rx1fold_ht) .^ 2;
 rx1_abs = sum(rx1_abs,2);
 
 %%
+[peak_val, peak_point] = max(rx1_abs);
+
 figure;
 plot(abs(rx1_abs), '-o');
 xticks(1:2560:slotn/fold*2560);
 grid on; title('func-pscSync')
-
-[peak_val, peak_point] = max(rx1_abs);
 
 slot0 = peak_point - length(c_pscf) + 1;
 slot0 = mod(slot0, 2560);

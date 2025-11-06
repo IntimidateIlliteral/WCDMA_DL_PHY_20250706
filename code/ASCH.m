@@ -16,7 +16,18 @@ load '../data1/zz.mat'
 load '../data1/code_s_sync.mat'
 load '../data1/frame_type_table_64_15.mat'
 load '../data1/code_scramble_38400_8_64.mat'
-
+%%
+simIn = 0;  % from simulink
+if simIn == 1
+    load('../../data_set/rx_0821_awgn.mat')
+    load '../data1/r_ideal.mat'
+    rxbb1 = rx0821;
+    rxbb1 = r_ideal;
+    oversample = 8;
+else
+    rxbb1 = rxzp;
+    oversample = 16;
+end
 %%
 F = 3.84e6;
 BW = F;
@@ -27,30 +38,21 @@ frames_you_need  = 3;
 slots_per_frame  = 15;
 symbols_per_slot = 10;
 OVSF             = 256;
-%%
-simIn = 0;  % from simulink
-if simIn == 1
-    load('../../data_set/rx_0821_awgn.mat')
-    rxbb1 = rx0821;
-    oversample = 8;
-else
-    rxbb1 = rxzp;
-    oversample = 16;
-end
+
 %% match_filter function
 % impulse forming filter before up_freq_conv/RF (seen in TS 1xx)
 a = 0.22;
-rc0 = @(t) ( sin(pi*t/tc*(1-a)) + 4*a*t/tc .*cos(pi*t/tc*(1+a)) )  ./....
-           (               pi*t/tc.* (1-(4*a*t/tc).^2)          )   ;  
-smbn = 8;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%       
-tt = -smbn*tc: tc/(oversample/2) : smbn*tc;
-plot(1:length(tt),rc0(tt),'x');grid on
+RC0t = @(t) ( sin(pi*t/tc*(1-a)) + 4*a*t/tc .*cos(pi*t/tc*(1+a)) )  ./....
+           (               pi*t/tc.* (1-(4*a*t/tc).^2)          )   ;
+       
+window_width = 8;    
+rect_window_tn = -window_width*tc: tc/(oversample/2) : window_width*tc;
 
-find(rc0(tt)==max(rc0(tt)));
+f = RC0t(rect_window_tn);
 
-tt(smbn*oversample/2+1)=1/65536/65536; % 1st jdd_kq
-plot(1:length(tt),rc0(tt),'x');grid on
-f = rc0(tt); [find(f==max(f)),length(f)];
+rect_window_tn(window_width*oversample/2+1)=1/65536/65536; % sinc(0); 1st jdd_kq
+plot(1:length(rect_window_tn),RC0t(rect_window_tn),'-');grid on
+f = RC0t(rect_window_tn);
 
 figure;plot(abs(fft(f,1024)));plot(abs(fft(f)),'o');
 xticks(1:length(fft(f))/oversample  :length(fft(f)));grid on;
@@ -118,7 +120,7 @@ f3 = 1;
 slots_you_need = slots_per_frame*f3;   
 slotss = rcom_psynced(1:slots_you_need*2560); 
 slotss = reshape(slotss,[2560,slots_you_need]);
-slotss = slotss(1:256,:); % 256*45
+slotss = slotss(1:256,:);
 %% xcorr(inner_prod) -> 1/16 peak
 ss = zeros(16,slots_you_need);
 for slid = 1:16
@@ -130,31 +132,40 @@ end
 ss = reshape(ss,[16,slots_per_frame,f3]);
 ss = sum(ss,3);
 tssc = max(ss);
-ssout=zeros(15,1);
-for slid = 1:15
+%
+ssout=zeros(slots_per_frame,1);
+for slid = 1:slots_per_frame
     ssout(slid) = find(ss(:,slid)==tssc(slid));
 end
-ssout';
 %% fwht256 -> 'spectrum' peak
 % cost reduced significantly
+Nfwht = OVSF;
 ssb = slotss.*z';
-ssb = fwht(ssb,OVSF,'hadamard');
-[tb, ssb] = max(abs(ssb));
-ssb = ssb/16 + 1;
+ssb_had_domain = fwht(ssb,Nfwht,'hadamard');
+ssb_had_domain_amp = abs(ssb_had_domain);
+ssb_had_domain_amp = ssb_had_domain_amp./max(ssb_had_domain_amp);
+
+[tb, ssb] = max(ssb_had_domain_amp);
+order = 2*log2(Nfwht);
+ssb = ssb/order + 1;
 ssb = ssb.';
-ssout_fwht = floor(ssb); % todo: not divided by 16
+%
+ssout_fwht = floor(ssb); % todo: not divided by 16   625*16 = 1e4
 %%
-diversity = zeros(64,15);
-for antenna = 0:63
-    for fen_ji=0:14
-        cs = circshift(real_bdb15(antenna+1,:), fen_ji);
-        diversity(antenna+1,fen_ji+1) = sum(ssout_fwht' == cs);
+frame_typesn = 64
+diversity = zeros(frame_typesn,slots_per_frame);
+for antenna = 1:frame_typesn
+    for fen_ji=1:slots_per_frame
+        cs = circshift(real_bdb15(antenna,:), fen_ji-1);
+        diversity(antenna,fen_ji) = sum(ssout_fwht' == cs);
     end
 end
 diversity
 [toils,snares]= find(diversity==max(max(diversity)));
 
 ssc_sync063 = [(toils-1),(snares-1)]
+ssync = [ssout,ssb,ssout_fwht, circshift(real_bdb15(toils,:).', snares-1)];
+
 %%
 ss_start0 = 2560 * ssc_sync063(2);
 rcom_ssynced  = rcom_psynced(ss_start0 + [1 : frames_you_need*chipsPerFrame] ) ;  

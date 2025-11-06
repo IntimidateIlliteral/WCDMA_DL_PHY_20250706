@@ -28,8 +28,7 @@ rcom_desccred = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need])
 rcom_desccred = reshape(rcom_desccred, [OVSF, symbols_per_slot, slots_you_need]);
 %% PCPI_pilot after freq compensate
 plx_pcpi = inner_product256(PCPI_spread_code, rcom_desccred);
-plx_pcpi = reshape(plx_pcpi, [symbols_per_slot, slots_you_need]);
-scatterplot(plx_pcpi(:)); grid on; title('pcpi_no_freq_cov');  % todo: sth wrong here
+scatterplot(plx_pcpi(:)); grid on; title('pcpi_no_freq_cov');  % nothing wrong here, you can see a single point scatter plot after phase correction
 figure;plot(angle(plx_pcpi(:)),'-o');
 %%
 % t=plx_pcpi(1500*0+(1:150)).* exp(1j*(98)*2*pi*(-1)*(44+(0:149))/3.84e+6 *256);
@@ -37,13 +36,12 @@ figure;plot(angle(plx_pcpi(:)),'-o');
 
 %% PCCP before phase correction;;;; note that no meaning to extract pccp3=405/450 currently
 plx_pccp = inner_product256(PCCP_spread_code,rcom_desccred);
-plx_pccp = reshape(plx_pccp, [150, frames_you_need]);
-
 
 %% phase correction for each slot
 % pcpi emitted (standard):
 p0 = exp(1j * (-3/4)*pi) + zeros(1,15*3);
 % pcpi recieved
+plx_pcpi = reshape(plx_pcpi, [symbols_per_slot, slots_you_need]);
 p1 = sum(plx_pcpi,1);
 % diff between above 2
 tz1 = p0 .* conj(p1);  tz2 = conj(p0) .* (p1);
@@ -55,6 +53,11 @@ bbb = angle(p1 .* conj(p0));
 rcom_desccred = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need]);
 rcom_desccred = exp(1j*(-1)*bbb) .* rcom_desccred;
 rcom_desccred = reshape(rcom_desccred, [OVSF, symbols_per_slot, slots_you_need]);
+
+%% PCPI after phase correction
+plx_pcpi = inner_product256(PCPI_spread_code, rcom_desccred);
+scatterplot(plx_pcpi(:)); grid on; title('pcpi_no_phase_shift');
+figure;plot(angle(plx_pcpi(:)),'-o');
 %% PCCP after phase correction
 % WRONG! plx_pccp = reshape(plx_pccp, [symbols_per_slot, slots_you_need]);
 % WRONG! plx_pccp = exp(1j*(-1)*bbb) .* plx_pccp;
