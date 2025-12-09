@@ -1,5 +1,34 @@
+close all;
+%% rxzp
+
+% % Unable to perform assignment because the size of the left side is 384256-by-1 and the size of the right side is 384248-by-1.
+
+% =mod(assorted-1,64);=floor(assorted/64);
 
 
+%% fold 256 then fold 3, to cancel more noise
+
+% May. 3rd 2023
+
+
+%% try eye_diagram, >=2bits per symb
+
+
+
+N=100;
+figure;
+os=8;srs=3;
+xx=55;
+rb=r_tt(256*xx+(1 : os*srs*100));
+rb=reshape(rb,[os*srs,100]);
+for i = 1:33
+    plot(real(rb(:,i)));hold on
+end
+xticks(0:os:os*3);grid on;
+%%
+pccp3 = plx_pccp_sf(s1,1:3);
+
+%%
 merge = zeros(9,15);
 for s09 = 0:14
     merge(:,s09+1)=(2:10)+10*s09;
@@ -8,7 +37,7 @@ merge = reshape(merge,[135,1]);
 
 %%
 % plx_pccp_sf
-% pccp3 = plx_pccp_sf(merge,1:3);
+% pccp3 = plx_pccp_sf(merge,1:3);  % from ../../../mutipath02
 pccp3 = reshape(pccp3, [135,3]);
 %% 1complex 4PSK 2bits sequence(real><0,imag<>0)
 shibu = real(pccp3); shibu(shibu>0)=0;shibu(shibu<0)=1;
