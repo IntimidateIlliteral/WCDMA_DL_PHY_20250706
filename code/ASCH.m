@@ -3,6 +3,8 @@ close all;
 clear;
 clc;
 
+
+addpath(genpath('../'))
 %% load data set firs, data set is uploaded now
 % load '../../data_set/zp_complex__type_double.mat'
 % load '../../data_set/local_all_ideal_100.mat'
