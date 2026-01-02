@@ -66,7 +66,6 @@ plx_pccp = inner_product256(PCCP_spread_code, rcom_desccred);
 symbols_per_frame = symbols_per_slot * slots_per_frame;
 plx_pccp = reshape(plx_pccp, [symbols_per_frame, frames_you_need]);
 
-
 %% for next step
 s1 = zeros(9,15);
 for s09 = 0:14
@@ -76,7 +75,8 @@ s1 = reshape(s1,[135,1]);
 
 plx_pccp = reshape(plx_pccp,[150,3]);
 pccp3 = plx_pccp(s1, :);
-scatterplot(pccp3(:,1));                                         grid on;
+scatterplot(pccp3(:,1));
+grid on;
 title('135 PCCP in 3 frames')
 
 %%
@@ -85,7 +85,20 @@ title('135 PCCP in 3 frames')
 pccp3 = reshape(pccp3,[405,1]);
 sb = real(pccp3);sb(sb>0)=0;sb(sb<0)=1;
 xb = imag(pccp3);xb(xb>0)=0;xb(xb<0)=1;
-aw2=[sb,xb]';
+aw2=[sb,xb].';
 aw2i=reshape(aw2,[810,1]);
 % for qq=imag(rxzp) or qq=real(rxzp):
 % aw2 here is practically the same, sum(aw2r==aw2i) = 808/810
+
+
+%% try eye_diagram, >=2bits per symb
+N=100;
+figure;
+os=8;srs=3;
+xx=55;
+rb=r_tt(256*xx+(1 : os*srs*100));
+rb=reshape(rb,[os*srs,100]);
+for i = 1:33
+    plot(real(rb(:,i)));hold on
+end
+xticks(0:os:os*3);grid on;

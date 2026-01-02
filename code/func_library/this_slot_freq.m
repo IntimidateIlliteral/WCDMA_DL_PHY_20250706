@@ -36,7 +36,10 @@ end
 
 % t = mean()
 
-figure;plot(magnitude);xticks([0,ppp,length(magnitude)/2,length(magnitude)]);grid on
+figure;
+plot(magnitude);
+xticks([0,ppp,length(magnitude)/2,length(magnitude)]);
+grid on
 
 end
 

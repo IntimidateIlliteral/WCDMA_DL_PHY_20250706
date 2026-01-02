@@ -109,7 +109,8 @@ real_bdb15=[
 dsj = 63;  %dsk%
 %ds  = 16*8*dsj + dsk*8;
 z63= zeros(8,2^18-1);
-x = zeros(1,2^(18-1));y = zeros(1,2^(18-1)); 
+x = zeros(1,2^(18-1));
+y = zeros(1,2^(18-1)); 
 x(1:18) = [1,zeros(1,17)];
 y(1:18) = 1+zeros(1,18);
 for dsi = 0:2^18-20
