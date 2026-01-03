@@ -1,5 +1,4 @@
 %% psc256 and ssc256_16
-clear;clc;close all;
 u = [1,1,1,-1,1,1,-1,-1,1,-1,1,-1,-1,-1,-1,-1].';
 %% psc
 x1=1+zeros(1,8);  x2 =x1;  x3 =x1; x4 =x1;  x5 =x1;  x6 =x1;  x7 =-x1; x8=-x1;
@@ -105,6 +104,7 @@ real_bdb15=[
     9,12,10,15,13,14,9,14,15,11,11,13,12,16,10
     ];
 %% scramble 38400*8*64
+% out 8*38400 8scrmbl_code  input dsj == 0~63
 
 dsj = 63;  %dsk%
 %ds  = 16*8*dsj + dsk*8;
@@ -131,6 +131,9 @@ sdl63r8 = zeros(8,38400);
 for sdli = 0:-1+38400
     sdl63r8(:,1+sdli) = Z63(:, 1+sdli)+ 1j* Z63(:, 1+ mod(sdli+131072,2^18-1));
 end
+
+scramble_64 = sdl63r8.';
+
 
 %%
 % hxghs = xcorr(c_ssc(1,:));
