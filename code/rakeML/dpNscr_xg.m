@@ -1,6 +1,4 @@
 function out = dpNscr_xg(dp, scr, over)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
 
 f = 38400;
 

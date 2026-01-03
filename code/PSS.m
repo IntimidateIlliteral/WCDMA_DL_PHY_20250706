@@ -31,4 +31,4 @@ clear rr8;
 % where/when a slot begin
 pt = psc_sync(rcom_1p8, c_pscf);
 rcom_psynced = rcom_1p8(pt:end);
-clear rcom_1p8;
+% clear rcom_1p8;

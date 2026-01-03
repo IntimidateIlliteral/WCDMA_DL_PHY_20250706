@@ -106,34 +106,36 @@ real_bdb15=[
 %% scramble 38400*8*64
 % out 8*38400 8scrmbl_code  input dsj == 0~63
 
-dsj = 63;  %dsk%
-%ds  = 16*8*dsj + dsk*8;
-z63= zeros(8,2^18-1);
-x = zeros(1,2^(18-1));
-y = zeros(1,2^(18-1)); 
-x(1:18) = [1,zeros(1,17)];
-y(1:18) = 1+zeros(1,18);
-for dsi = 0:2^18-20
-    x(1+dsi + 18) = mod(x(1+dsi+7 )+x(1+dsi) ,2);
-    y(1+dsi + 18) = mod(y(1+dsi+10)+y(1+dsi+7)+y(1+dsi+5)+y(1+dsi) ,2);
-end
-for dszk =0:7
-    dsn = 16*8*dsj + 16*dszk;
-    for dsxzi = 0:2^18-2
-        z63(1+dszk,1+dsxzi) = mod(x (1+mod(dsxzi+dsn,2^18-1)) +y(1+dsxzi) ,2);
-    end    
-end
-Z63 = z63;
-Z63(z63==0)=  1;
-Z63(z63==1)= -1;
+scramble_64 = zeros(chipsPerFrame, 8, 64);
+for dsj = 0:63  %dsk%
+    %ds  = 16*8*dsj + dsk*8;
+    z63= zeros(8,2^18-1);
+    x = zeros(1,2^(18-1));
+    y = zeros(1,2^(18-1)); 
+    x(1:18) = [1,zeros(1,17)];
+    y(1:18) = 1+zeros(1,18);
+    for dsi = 0:2^18-20
+        x(1+dsi + 18) = mod(x(1+dsi+7 )+x(1+dsi) ,2);
+        y(1+dsi + 18) = mod(y(1+dsi+10)+y(1+dsi+7)+y(1+dsi+5)+y(1+dsi) ,2);
+    end
+    for dszk =0:7
+        dsn = 16*8*dsj + 16*dszk;
+        for dsxzi = 0:2^18-2
+            z63(1+dszk,1+dsxzi) = mod(x (1+mod(dsxzi+dsn,2^18-1)) +y(1+dsxzi) ,2);
+        end    
+    end
+    Z63 = z63;
+    Z63(z63==0)=  1;
+    Z63(z63==1)= -1;
 
-sdl63r8 = zeros(8,38400);
-for sdli = 0:-1+38400
-    sdl63r8(:,1+sdli) = Z63(:, 1+sdli)+ 1j* Z63(:, 1+ mod(sdli+131072,2^18-1));
+    sdl63r8 = zeros(8,38400);
+    for sdli = 0:-1+38400
+        sdl63r8(:,1+sdli) = Z63(:, 1+sdli)+ 1j* Z63(:, 1+ mod(sdli+131072,2^18-1));
+    end
+
+    scramble_64(:,:, dsj+1) = sdl63r8.';
+
 end
-
-scramble_64 = sdl63r8.';
-
 
 %%
 % hxghs = xcorr(c_ssc(1,:));
