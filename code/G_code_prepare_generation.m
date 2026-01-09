@@ -105,7 +105,7 @@ real_bdb15=[
     ];
 %% scramble 38400*8*64
 % out 8*38400 8scrmbl_code  input dsj == 0~63
-
+chipsPerFrame = 38400;
 scramble_64 = zeros(chipsPerFrame, 8, 64);
 for dsj = 0:63  %dsk%
     %ds  = 16*8*dsj + dsk*8;
