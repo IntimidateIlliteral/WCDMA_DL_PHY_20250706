@@ -35,7 +35,7 @@ for k = 1:16
     end
 end
 c_sscf  = c_ssc (:,end:-1:1);
-save('zz','z')
+% save('zz','z')
 %% 64_15 frame_type
 real_bdb15=[
     1,1,2,8,9,10,15,8,10,16,2,7,15,7,16;
