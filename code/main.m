@@ -23,15 +23,18 @@ else
 end
 
 %%
-set_parameters4air_interface
+set_parameters4radio_interface
 %%
-G_code_prepare_generation
+code_generation
 %%
+% impulse_response = f;
+% rcom = myMatchFilter(rxbb1, impulse_response);
 match_filter
 %%
-PSS
+% whereAslotStarts = myPss(rxbb1, psc, os8);
+pss
 %%
-SSS
+sss
 %%
 descramble
 %% constellation_QPSK

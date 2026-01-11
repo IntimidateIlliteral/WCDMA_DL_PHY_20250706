@@ -1,8 +1,11 @@
 
 %% 8 oversample 8
-rr8 = zeros(length(rcom)/8,8);
-for phase_bias = 0:7
-    rr8(:,phase_bias+1) = downsample(rcom,8,phase_bias);
+os8 = 8;
+
+rr8 = zeros(length(rcom)/os8, os8);
+
+for phase_bias = 0:-1+os8
+    rr8(:,phase_bias+1) = downsample(rcom,os8,phase_bias);
 end
 clear rcom;
 %% find max power phase 1/8 using psc
@@ -28,7 +31,7 @@ phase = find(psyncp_xg == max(psyncp_xg));
 rcom_1p8 = rr8(:, phase+1);
 clear rr8;
 %% pss slot_sync
-% where/when a slot begin
+% where/when a slot begins
 pt = psc_sync(rcom_1p8, c_pscf);
 rcom_psynced = rcom_1p8(pt:end);
 % clear rcom_1p8;
