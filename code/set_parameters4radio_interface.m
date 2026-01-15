@@ -12,8 +12,9 @@ chipsPerSymbol = OVSF;
 % chipsPerFrame    = 3.84e4;
 chipsPerFrame  = chipsPerSymbol*symbols_per_slot*slots_per_frame;
 chipsPerSecond = chipsPerFrame * framesPerSecond;
+chiprate = chipsPerSecond;
 % BW = 3.84e6;
-BW = chipsPerSecond;
+BW = chiprate;
 F = BW;
 T = 1/F; 
 tc = T;  % min time_unit
@@ -21,3 +22,5 @@ tc = T;  % min time_unit
 %
 fz = 15.36e+6;  % 4*bbBW
 sa = 4*fz;
+samplesPerSymbol = 16;
+sps = samplesPerSymbol;
