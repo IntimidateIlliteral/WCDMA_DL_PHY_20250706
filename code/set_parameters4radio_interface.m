@@ -1,7 +1,7 @@
 
 
 %% preference, settings, parameters, configuration
-% for WCDMA air_interface_L1PHY, downlink
+% for WCDMA radio_interface_L1PHY, downlink
 
 framesPerSecond  = 100;
 frames_you_need  = 3;
