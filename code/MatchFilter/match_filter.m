@@ -10,7 +10,7 @@ h_tn = h_tn_of_WCDMApulseShapingFilter(window_widthN, oversample, tc);
 % rxbb1 = filter(f,1,rxbb1);  % sum(rcom_psynced ==rt)
 % rxbb1 = rxbb1(smb*8+1:end); 
 % Unable to perform assignment because the size of the left side is 384256-by-1 and the size of the right side is 384248-by-1.
-%% todo: I-Q sample 与超外差-中频接收机
+
 ii = real(rxbb1); % .*cos(2*pi*(fz/sa)*(0:-1+length(rxzp))).';
 ii = filter(h_tn,1,ii);
 
