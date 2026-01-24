@@ -36,14 +36,20 @@ for phase_bias = 0:-1+oversample
 end
 clear rcom;
 
-% whereAslotStarts = myPss(rxbb1, psc, os8);
+%% where a slot starts
 [phase, pt] = pss(rcom_down2nyquist_allPhase, oversample, c_pscf);
 rcom_psynced = rcom_down2nyquist_allPhase(pt:end, phase+1);
-%%
-sss
-%%
-descramble
-%% constellation_QPSK
-despread_LOS
+
+%% where a frame starts
+[ss_start0, ssc_sync063] = sss(rcom_psynced, c_ssc, real_bdb15, z);
+rcom_ssynced  = rcom_psynced(ss_start0 + [1 : frames_you_need*chipsPerFrame] ) ;
+
+%% Rx_3frame de_scramble
+primary_scramb_code = descramble(rcom_ssynced, scramble_64, ssc_sync063);
+rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
+
+%% constellation_QPSK for PCCPCH_3_frames
+pccp3 = despread_LOS(rcom_desccred);
+
 %%
 after_constellation_HARD_decision
