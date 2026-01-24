@@ -23,16 +23,22 @@ else
 end
 
 %%
-set_parameters4radio_interface
+set_parameters4WCDMA_radio_interface_PHY
 %%
 code_generation
 %%
-% impulse_response = f;
-% rcom = myMatchFilter(rxbb1, impulse_response);
-match_filter
+[rcom, oversample] = match_filter(rxbb1, oversample, tc);
 %%
+rcom_down2nyquist_allPhase = zeros(length(rcom)/oversample, oversample);
+%% 8 oversample 8
+for phase_bias = 0:-1+oversample
+    rcom_down2nyquist_allPhase(:,phase_bias+1) = downsample(rcom,oversample,phase_bias);
+end
+clear rcom;
+
 % whereAslotStarts = myPss(rxbb1, psc, os8);
-pss
+[phase, pt] = pss(rcom_down2nyquist_allPhase, oversample, c_pscf);
+rcom_psynced = rcom_down2nyquist_allPhase(pt:end, phase+1);
 %%
 sss
 %%
