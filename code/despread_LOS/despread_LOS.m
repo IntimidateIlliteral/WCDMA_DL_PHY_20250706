@@ -1,3 +1,9 @@
+function PCCPCH3 = despread_LOS(rcom_desccred)
+%% global
+OVSF = 256;
+symbols_per_slot = 10;
+slots_per_frame  = 15;
+frames_you_need  = 3;
 %%
 close all;clc;
 %%
@@ -74,7 +80,9 @@ end
 s1 = reshape(s1,[135,1]);
 
 plx_pccp = reshape(plx_pccp,[150,3]);
-pccp3 = plx_pccp(s1, :);
-scatterplot(pccp3(:,1));
+PCCPCH3 = plx_pccp(s1, :);
+scatterplot(PCCPCH3(:,1));
 grid on;
 title('135 PCCP in 3 frames')
+
+end

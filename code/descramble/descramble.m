@@ -1,9 +1,11 @@
-
+function primary_scramb_code = descramble(rcom_ssynced, scramble_64, ssc_sync063)
+%% global?
+chipsPerFrame = 38400;
+%% 注意scramble是针对的帧，而不是时隙或符号或两帧。扰码的长度是38400=chipsPerFrame
 % descramble, find cell_scramble_code
 
 %%
-rcom_framestart  = rcom_ssynced(1 : chipsPerFrame * frames_you_need);
-tmp_frame1    = rcom_framestart(1 : chipsPerFrame);
+tmp_frame1    = rcom_ssynced(1 : chipsPerFrame);
 
 %%
 primary_scramb_code8 = scramble_64(:, :, ssc_sync063(1) + 1);
@@ -21,5 +23,4 @@ ms8 = ms8/ms8max
 
 %
 primary_scramb_code = primary_scramb_code8(:, dp_mo_square);
-%% Rx_3frame de_scramble
-rcom_desccred = reshape(rcom_framestart,[chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
+end

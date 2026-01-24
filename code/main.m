@@ -23,21 +23,33 @@ else
 end
 
 %%
-set_parameters4radio_interface
+set_parameters4WCDMA_radio_interface_PHY
 %%
 code_generation
 %%
-% impulse_response = f;
-% rcom = myMatchFilter(rxbb1, impulse_response);
-match_filter
+[rcom, oversample] = match_filter(rxbb1, oversample, tc);
 %%
-% whereAslotStarts = myPss(rxbb1, psc, os8);
-pss
-%%
-sss
-%%
-descramble
-%% constellation_QPSK
-despread_LOS
+rcom_down2nyquist_allPhase = zeros(length(rcom)/oversample, oversample);
+%% 8 oversample 8
+for phase_bias = 0:-1+oversample
+    rcom_down2nyquist_allPhase(:,phase_bias+1) = downsample(rcom,oversample,phase_bias);
+end
+clear rcom;
+
+%% where a slot starts
+[phase, pt] = pss(rcom_down2nyquist_allPhase, oversample, c_pscf);
+rcom_psynced = rcom_down2nyquist_allPhase(pt:end, phase+1);
+
+%% where a frame starts
+[ss_start0, ssc_sync063] = sss(rcom_psynced, c_ssc, real_bdb15, z);
+rcom_ssynced  = rcom_psynced(ss_start0 + [1 : frames_you_need*chipsPerFrame] ) ;
+
+%% Rx_3frame de_scramble
+primary_scramb_code = descramble(rcom_ssynced, scramble_64, ssc_sync063);
+rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
+
+%% constellation_QPSK for PCCPCH_3_frames
+pccp3 = despread_LOS(rcom_desccred);
+
 %%
 after_constellation_HARD_decision

@@ -1,4 +1,4 @@
-
+function [rcom, oversampleAfter] = match_filter(rxbb1, oversample, tc)
 
 %% match_filter function____transmit_pulse_shape_filter  TS-25.101-6.8.1
 
@@ -24,4 +24,6 @@ qq = filter(h_tn,1,qq);
 rxbb = ii+1j*qq;  % oversample 16 * baseband
 %
 rcom = downsample(rxbb, oversample/8);
-oversample = 8;
+oversampleAfter = 8;
+
+end
