@@ -1,12 +1,11 @@
-# WCDMA_DL_PHY_20250706
-WCDMA下行空口物理层：  
-中间输出（当前）：连续3帧PCCPCH的星座图    
-最终输出：PCCPCH，解CRC无错误
+# WCDMA_DL_PHY_20250706, WCDMA下行空口物理层
+中间输出（当前）：pccp3: 连续3帧PCCPCH的QPSK星座图    
+最终输出：       PCCPCH解CRC无错误
 
 运行：main.m  
-输入：0.1s数字基带信号（在数据集data1中，中频载波15.36MHz，采样率61.44MHz）    
+输入：rxbb1 = rxzp, 0.1s空口采样数字基带信号（采样率61.44MHz，中频载波15.36MHz，从数据集/data_set中 load）
 
-## contact me 1960851445@qq.com if you have anything instresting
+## contact me on github if you have anything instresting
 ## 关键遗留问题：多径合并-rake。想搞成rake接收（多径=时间分集，合并）
 但是第一步多径搜索——用的扰码相关搜峰——根本搜不到多径，只有最强径，其他“径”幅度几乎无峰——第二大的极大值点为0.08左右，太弱了没法用。  
 看论文里写的，一般rake跟踪的峰值大概0.3~1范围，再弱的不合并——合并无法提供Eb/N0增益，不跟了；  
@@ -26,7 +25,6 @@ WCDMA下行空口物理层：
 ## 关键遗留问题5：虚部是+还是-？复包络，希尔伯特，IQ采样，上下变频
 %% todo: I-Q sample 与超外差-中频接收机，基带信号的实部虚部到底是？
 ## 本人暂时还没有自己采空口数据的条件，如果有好人分享给我一份，感激不尽！
-我的邮箱：1960851445@qq.com 
 
 ## 数据集dataSet较大，在想办法上传
 ## 数据集/data1 已上传！
