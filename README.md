@@ -1,11 +1,14 @@
 # WCDMA_DL_PHY_20250706, WCDMA下行空口物理层
-中间输出（当前）：pccp3: 连续3帧PCCPCH的QPSK星座图    
+中间输出（当前）：QPSK星座图，pccp3 = 连续3帧PCCPCH    
 最终输出：       PCCPCH解CRC无错误
 
 运行：main.m  
 输入：rxbb1 = rxzp, 0.1s空口采样数字基带信号（采样率61.44MHz，中频载波15.36MHz，从数据集/data_set中 load）
 
-## contact me on github if you have anything instresting
+https://github.com/IntimidateIlliteral/WCDMA_DL_PHY_20250706  
+https://gitee.com/WYH_wudiaoteman/WCDMA_DL_PHY_20250706
+
+## Contact me on github, should you have anything instresting.
 ## 关键遗留问题：多径合并-rake。想搞成rake接收（多径=时间分集，合并）
 但是第一步多径搜索——用的扰码相关搜峰——根本搜不到多径，只有最强径，其他“径”幅度几乎无峰——第二大的极大值点为0.08左右，太弱了没法用。  
 看论文里写的，一般rake跟踪的峰值大概0.3~1范围，再弱的不合并——合并无法提供Eb/N0增益，不跟了；  
