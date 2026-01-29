@@ -1,5 +1,5 @@
 %%
-scr = primary_scramb_codet8(:, dsc);
+scr = primary_scramb_code;
 
 clc
 %%
@@ -16,6 +16,7 @@ end
 
 neighbor = (-dsr + 1 : dsr + chipsPerFrame);
 
+rr8 = rcom_down2nyquist_allPhase;
 rcom_frameNeighbor  = rr8(fs1 + neighbor, :);
 
 %%
