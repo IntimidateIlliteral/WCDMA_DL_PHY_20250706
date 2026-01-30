@@ -49,7 +49,10 @@ primary_scramb_code = descramble(rcom_ssynced, scramble_64, ssc_sync063);
 rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
 
 %% constellation_QPSK for PCCPCH_3_frames
+close all;clc;
 pccp3 = despread_LOS(rcom_desccred);
+
+%%
 
 %%
 after_constellation_HARD_decision

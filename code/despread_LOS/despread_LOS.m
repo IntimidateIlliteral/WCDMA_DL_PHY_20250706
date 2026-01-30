@@ -4,10 +4,9 @@ OVSF = 256;
 symbols_per_slot = 10;
 slots_per_frame  = 15;
 frames_you_need  = 3;
-%%
-close all;clc;
-%%
-rcom_desccred = reshape(rcom_desccred, [OVSF, symbols_per_slot*slots_per_frame, frames_you_need]);
+slots_you_need = slots_per_frame*frames_you_need;
+
+
 %% hadamard256==walsh256
 walsh256 = hadamard(256); % 256*256 matrix  symmetric
 % hdm256_0 =   1 + zeros(OVSF,1);
@@ -16,22 +15,57 @@ inverseOrder8bit_0 = bin2dec('0000 0000');
 inverseOrder8bit_1 = bin2dec('1000 0000');
 PCPI_spread_code = walsh256(:, 1+ inverseOrder8bit_0);
 PCCP_spread_code = walsh256(:, 1+ inverseOrder8bit_1);
-
+%%
+rcom_desccred = reshape(rcom_desccred, [OVSF, symbols_per_slot*slots_per_frame, frames_you_need]);
 %% pcpi_pilot from Rx de_spread  
 plx_pcpi = PCPI_spread_code .* rcom_desccred; 
 plx_pcpi = sum(plx_pcpi,1);
 plx_pcpi = plx_pcpi(:);
+
+%%
 scatterplot(plx_pcpi); grid on; title('pcpi');
 figure;plot(angle(plx_pcpi(:)),'-o');
 
 %% freq compensate COARSE_DFS for each slot
-Nfft = 1024; Nfold = OVSF;
 
-slots_you_need = slots_per_frame*frames_you_need;
 % for each slot, compensate freq
 [fp, pp] = this_slot_freq(plx_pcpi);
 rcom_desccred = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need]) .* pp;
+rcom_0doppler = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need]) .* pp;
 rcom_desccred = reshape(rcom_desccred, [OVSF, symbols_per_slot, slots_you_need]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 %% PCPI_pilot after freq compensate
 plx_pcpi = inner_product256(PCPI_spread_code, rcom_desccred);
 scatterplot(plx_pcpi(:)); grid on; title('pcpi_no_freq_cov');  % nothing wrong here, you can see a single point scatter plot after phase correction
