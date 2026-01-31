@@ -55,30 +55,46 @@ primary_scramb_code = descramble(rcom_ssynced, scramble_64, ssc_sync063);
 close all;
 
 window_radius_chips = 10;
-[Rxx_cor_energy, pkl, whereAllPathStart, phaseAllOverSa] = Rake_multipath_FindPeaks(oversample, window_radius_chips, rcom_down2nyquist_allPhase, whereStrongestPathStart, phaseOverSa, primary_scramb_code);
+[Rxx_cor_energy, pk, pkl, whereAllPathStart, phaseAllOverSa] = Rake_multipath_FindPeaks(oversample, window_radius_chips, rcom_down2nyquist_allPhase, whereStrongestPathStart, phaseOverSa, primary_scramb_code);
 
 
 %% for each finger
-% for
-rcom_ssynced = rcom_down2nyquist_allPhase(whereStrongestPathStart+ (1 : frames_you_need*chipsPerFrame), 1+phaseOverSa);
-rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
-% end
-%% constellation_QPSK for PCCPCH_3_frames
-%% freq compensate COARSE_DFS 
-% for each slot
-[fp, pp] = this_slot_freq(rcom_desccred, PCPI_spread_code);
-rcom_0doppler = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need]) .* pp;
-
-%% phaseOffset
-bbb = this_slot_phase(rcom_0doppler, PCPI_spread_code, PCCP_spread_code);
-% rx phase_corrected
-% note that phase_correction is for rx instead of PCCPCH or any other despread_CH
-% just like freq_correction
-rcom_0phaseOffset = exp(1j*(-1)*bbb) .* reshape(rcom_0doppler, [OVSF* symbols_per_slot, slots_you_need]);
+numPaths = length(pkl);  % only those that pass the threshold
+rx4combine = zeros(chipsPerFrame*frames_you_need, numPaths);
+for thisPathID = 1:numPaths
+    %%
+    whereThisPathStart = whereAllPathStart(thisPathID) + whereStrongestPathStart;
+    thisPathPhaseOverSa = phaseAllOverSa(thisPathID);
 
 
+    %%
+    rcom_ssynced = rcom_down2nyquist_allPhase(whereThisPathStart+ (1 : frames_you_need*chipsPerFrame), 1+thisPathPhaseOverSa);
+    rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
+
+    %% constellation_QPSK for PCCPCH_3_frames
+    %% freq compensate COARSE_DFS 
+    % for each slot
+    [fp, pp] = this_slot_freq(rcom_desccred, PCPI_spread_code);
+    rcom_0doppler = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need]) .* pp;
+
+    %% phaseOffset
+    bbb = this_slot_phase(rcom_0doppler, PCPI_spread_code, PCCP_spread_code);
+    % rx phase_corrected
+    % note that phase_correction is for rx instead of PCCPCH or any other despread_CH
+    % just like freq_correction
+    rcom_0phaseOffset = exp(1j*(-1)*bbb) .* reshape(rcom_0doppler, [OVSF* symbols_per_slot, slots_you_need]);
+    
+    %%
+    thisPathEnergy = pk(thisPathID);
+    coeff_zuidabiCombine = (thisPathEnergy)^(1/2);
+    rx4combine(:, thisPathID) = rcom_0phaseOffset(:) * coeff_zuidabiCombine;
+
+end
+
+
+rx_combined = sum(rx4combine, 2);
 %%
-pccp3 = despread_LOS(rcom_0phaseOffset, PCPI_spread_code, PCCP_spread_code);
+pccp3 = despread_LOS(rx_combined, PCPI_spread_code, PCCP_spread_code);
 
 %%
 
