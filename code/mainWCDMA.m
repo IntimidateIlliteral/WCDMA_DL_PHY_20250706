@@ -56,28 +56,15 @@ close all;clc;
 [fp, pp] = this_slot_freq(rcom_desccred, PCPI_spread_code);
 rcom_0doppler = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need]) .* pp;
 
+%% phaseOffset
+bbb = this_slot_phase(rcom_0doppler, PCPI_spread_code, PCCP_spread_code);
+% rx phase_corrected
+% note that phase_correction is for rx instead of PCCPCH or any other despread_CH
+% just like freq_correction
+rcom_0phaseOffset = exp(1j*(-1)*bbb) .* reshape(rcom_0doppler, [OVSF* symbols_per_slot, slots_you_need]);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-pccp3 = despread_LOS(rcom_0doppler, PCPI_spread_code, PCCP_spread_code);
+pccp3 = despread_LOS(rcom_0phaseOffset, PCPI_spread_code, PCCP_spread_code);
 
 %%
 
