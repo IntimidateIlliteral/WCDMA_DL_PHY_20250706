@@ -30,26 +30,36 @@ code_generation
 [rcom, oversample] = match_filter(rxbb1, oversample, tc);
 %%
 rcom_down2nyquist_allPhase = zeros(length(rcom)/oversample, oversample);
-%% 8 oversample 8
+% 8 oversample 8
 for phase_bias = 0:-1+oversample
     rcom_down2nyquist_allPhase(:,phase_bias+1) = downsample(rcom,oversample,phase_bias);
 end
 clear rcom;
 
 %% where a slot starts
-[phase, pt] = pss(rcom_down2nyquist_allPhase, oversample, c_pscf);
-rcom_psynced = rcom_down2nyquist_allPhase(pt:end, phase+1);
+[phaseOverSa, pt] = pss(rcom_down2nyquist_allPhase, oversample, c_pscf);
+rcom_psynced = rcom_down2nyquist_allPhase(pt+1:end, phaseOverSa+1);
 
 %% where a frame starts
 [ss_start0, ssc_sync063] = sss(rcom_psynced, c_ssc, real_bdb15, z);
-rcom_ssynced  = rcom_psynced(ss_start0 + [1 : frames_you_need*chipsPerFrame] ) ;
+rcom_ssynced =                            rcom_psynced(ss_start0 + (1 : frames_you_need*chipsPerFrame) ) ;
+%
+whereStrongestPathStart = pt + ss_start0;
+whereStrongestPathStartSample = phaseOverSa + oversample * whereStrongestPathStart;
+rcom_ssynced = rcom_down2nyquist_allPhase(whereStrongestPathStart+ (1 : frames_you_need*chipsPerFrame), 1+phaseOverSa);
 
 %% Rx_3frame de_scramble
 primary_scramb_code = descramble(rcom_ssynced, scramble_64, ssc_sync063);
 rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
 
 %% Rake==time_diversity, erergy_window.
+[Rxx_cor_energy, pkl, whereAllPathStart, phaseAllOverSa] = Rake_multipath_FindPeaks(oversample, 20, rcom_down2nyquist_allPhase, whereStrongestPathStart, phaseOverSa, primary_scramb_code);
 
+
+%% for each finger
+% for
+
+% end
 %% constellation_QPSK for PCCPCH_3_frames
 close all;clc;
 %% freq compensate COARSE_DFS 

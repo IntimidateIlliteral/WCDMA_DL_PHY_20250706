@@ -23,7 +23,7 @@ xticks(1:slotlen:slotn/fold*slotlen);
 grid on; title('func-pscSync')
 
 slot0 = peak_point - length(c_pscf) + 1;
-slot0 = mod(slot0, slotlen);
+slot0 = -1 + mod(slot0, slotlen);
 
 end
 
