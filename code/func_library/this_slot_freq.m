@@ -1,15 +1,32 @@
 
-function [d6_freq, d6_phase] = this_slot_freq(frame3_despreaded)
+function [d6_freq, d6_phase] = this_slot_freq(rcom_desccred, PCPI_spread_code)
 
+%% global
 OVSF = 256;
 Nfft = 1024; Nfold = OVSF; 
 F = 3.84e+6;
+slots_per_frame  = 15;
+frames_you_need  = 3;
 
 symbols_per_slot = 10;
 chips_per_slot = symbols_per_slot * Nfold;  % OVSF * symbolsPerSlot
 
+
+%%
+rcom_desccred = reshape(rcom_desccred, [OVSF, symbols_per_slot*slots_per_frame, frames_you_need]);
+%% pcpi_pilot from Rx de_spread  
+plx_pcpi = PCPI_spread_code .* rcom_desccred; 
+plx_pcpi = sum(plx_pcpi,1);
+plx_pcpi = plx_pcpi(:);
+frame3_despreaded = plx_pcpi;
+%%
+scatterplot(plx_pcpi); grid on; title('pcpi');
+figure;plot(angle(plx_pcpi(:)),'-o');
+
+%%
 slot_n = length(frame3_despreaded) / symbols_per_slot;
 
+%%
 m0 = reshape(frame3_despreaded, [symbols_per_slot, slot_n]);
 
 m0 = fft(m0, Nfft);

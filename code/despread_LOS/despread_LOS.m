@@ -1,4 +1,4 @@
-function PCCPCH3 = despread_LOS(rcom_desccred, PCPI_spread_code, PCCP_spread_code)
+function PCCPCH3 = despread_LOS(rcom_0doppler, PCPI_spread_code, PCCP_spread_code)
 %% global
 OVSF = 256;
 symbols_per_slot = 10;
@@ -7,22 +7,6 @@ frames_you_need  = 3;
 slots_you_need = slots_per_frame*frames_you_need;
 
 
-%%
-rcom_desccred = reshape(rcom_desccred, [OVSF, symbols_per_slot*slots_per_frame, frames_you_need]);
-%% pcpi_pilot from Rx de_spread  
-plx_pcpi = PCPI_spread_code .* rcom_desccred; 
-plx_pcpi = sum(plx_pcpi,1);
-plx_pcpi = plx_pcpi(:);
-
-%%
-scatterplot(plx_pcpi); grid on; title('pcpi');
-figure;plot(angle(plx_pcpi(:)),'-o');
-
-%% freq compensate COARSE_DFS for each slot
-
-% for each slot, compensate freq
-[fp, pp] = this_slot_freq(plx_pcpi);
-rcom_0doppler = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need]) .* pp;
 
 
 % rcom_0doppler = compensateFreqDeviation(rcom_desccred, )

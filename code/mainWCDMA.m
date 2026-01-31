@@ -50,7 +50,34 @@ rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(
 
 %% constellation_QPSK for PCCPCH_3_frames
 close all;clc;
-pccp3 = despread_LOS(rcom_desccred, PCPI_spread_code, PCCP_spread_code);
+%% freq compensate COARSE_DFS for each slot
+
+% for each slot, compensate freq
+[fp, pp] = this_slot_freq(rcom_desccred, PCPI_spread_code);
+rcom_0doppler = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need]) .* pp;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pccp3 = despread_LOS(rcom_0doppler, PCPI_spread_code, PCCP_spread_code);
 
 %%
 

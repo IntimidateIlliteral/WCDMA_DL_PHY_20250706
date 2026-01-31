@@ -5,7 +5,7 @@
 
 framesPerSecond  = 100;
 frames_you_need  = 3;
-slots_per_frame  = 15;
+slots_per_frame  = 15; slots_you_need = slots_per_frame*frames_you_need;
 symbols_per_slot = 10;
 OVSF             = 256; 
 chipsPerSymbol = OVSF;
