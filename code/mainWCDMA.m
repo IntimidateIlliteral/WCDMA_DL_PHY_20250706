@@ -48,11 +48,12 @@ rcom_ssynced  = rcom_psynced(ss_start0 + [1 : frames_you_need*chipsPerFrame] ) ;
 primary_scramb_code = descramble(rcom_ssynced, scramble_64, ssc_sync063);
 rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
 
+%% Rake==time_diversity, erergy_window.
+
 %% constellation_QPSK for PCCPCH_3_frames
 close all;clc;
-%% freq compensate COARSE_DFS for each slot
-
-% for each slot, compensate freq
+%% freq compensate COARSE_DFS 
+% for each slot
 [fp, pp] = this_slot_freq(rcom_desccred, PCPI_spread_code);
 rcom_0doppler = reshape(rcom_desccred, [OVSF* symbols_per_slot, slots_you_need]) .* pp;
 
@@ -64,6 +65,7 @@ bbb = this_slot_phase(rcom_0doppler, PCPI_spread_code, PCCP_spread_code);
 rcom_0phaseOffset = exp(1j*(-1)*bbb) .* reshape(rcom_0doppler, [OVSF* symbols_per_slot, slots_you_need]);
 
 
+%%
 pccp3 = despread_LOS(rcom_0phaseOffset, PCPI_spread_code, PCCP_spread_code);
 
 %%
