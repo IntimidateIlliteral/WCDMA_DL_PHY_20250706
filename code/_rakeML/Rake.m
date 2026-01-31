@@ -1,28 +1,30 @@
 fingern = 4;
 
-delay_spread_radius = 20;  dsr = delay_spread_radius; % chips
+delay_spread_radius = 20;  % chips
 
-scr = primary_scramb_codet8(:, dsc);
+primary_scramb_code = primary_scramb_code;
+
+oversample = 8;
+
+samplesPerFrame = oversample*chipsPerFrame;
 
 %%
-tmp_f = rcom_ssynced(1*chipsPerFrame+(-dsr : chipsPerFrame + dsr));
-p = zeros(2*dsr+1, 8);
-for ci = 0:2*dsr
+tmp_f = rcom_ssynced(1*chipsPerFrame+(-delay_spread_radius : chipsPerFrame + delay_spread_radius));
+p = zeros(2*delay_spread_radius+1, 8);
+for ci = 0:2*delay_spread_radius
     
     frame = tmp_f(ci + (1:chipsPerFrame));
     
-    p(1 + ci, :) = dpNscr_xg(frame, scr, 1);
+    p(1 + ci, :) = dpNscr_xg(frame, primary_scramb_code, 1);
     
 end
 p=p./max(p)
 
 %%
-oversample = 8;
 
-samplesPerFrame = oversample*chipsPerFrame;
-dsr8 = oversample*dsr;
+dsr8 = oversample*delay_spread_radius;
 
-scr8 = scr + zeros(chipsPerFrame, oversample);
+scr8 = primary_scramb_code + zeros(chipsPerFrame, oversample);
 scr8 = scr8.';
 scr8 = scr8(:);
 
@@ -50,7 +52,7 @@ end
 
 [ps,pind] = sort(p); pind = pind(end:-1:1)
 jdz = 1;
-for i = 2:dsr
+for i = 2:delay_spread_radius
     it = pind(i);
 %     iz = pi(i-1);    
 %     iy = pi(i+1);
