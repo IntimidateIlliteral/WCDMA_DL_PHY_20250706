@@ -50,18 +50,20 @@ rcom_ssynced = rcom_down2nyquist_allPhase(whereStrongestPathStart+ (1 : frames_y
 
 %% Rx_3frame de_scramble
 primary_scramb_code = descramble(rcom_ssynced, scramble_64, ssc_sync063);
-rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
 
 %% Rake==time_diversity, erergy_window.
-[Rxx_cor_energy, pkl, whereAllPathStart, phaseAllOverSa] = Rake_multipath_FindPeaks(oversample, 20, rcom_down2nyquist_allPhase, whereStrongestPathStart, phaseOverSa, primary_scramb_code);
+close all;
+
+window_radius_chips = 10;
+[Rxx_cor_energy, pkl, whereAllPathStart, phaseAllOverSa] = Rake_multipath_FindPeaks(oversample, window_radius_chips, rcom_down2nyquist_allPhase, whereStrongestPathStart, phaseOverSa, primary_scramb_code);
 
 
 %% for each finger
 % for
-
+rcom_ssynced = rcom_down2nyquist_allPhase(whereStrongestPathStart+ (1 : frames_you_need*chipsPerFrame), 1+phaseOverSa);
+rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(primary_scramb_code);
 % end
 %% constellation_QPSK for PCCPCH_3_frames
-close all;clc;
 %% freq compensate COARSE_DFS 
 % for each slot
 [fp, pp] = this_slot_freq(rcom_desccred, PCPI_spread_code);
