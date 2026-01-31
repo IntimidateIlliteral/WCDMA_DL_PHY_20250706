@@ -50,7 +50,7 @@ rcom_desccred = reshape(rcom_ssynced, [chipsPerFrame, frames_you_need]) .* conj(
 
 %% constellation_QPSK for PCCPCH_3_frames
 close all;clc;
-pccp3 = despread_LOS(rcom_desccred);
+pccp3 = despread_LOS(rcom_desccred, PCPI_spread_code, PCCP_spread_code);
 
 %%
 
